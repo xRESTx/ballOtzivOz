@@ -1,0 +1,25 @@
+# Файл с cookies для парсера Ozon
+# Формат: каждая строка содержит cookie в одном из форматов:
+#
+# 1. Простой формат:
+# name=value
+#
+# 2. С атрибутами:
+# name=value; domain=.ozon.ru; path=/; secure
+#
+# 3. Netscape формат (табуляция):
+# domain	flag	path	secure	expiration	name	value
+#
+# Примеры cookies (замените на свои реальные cookies из браузера):
+# __Secure-ETC=e05aa79ce4f8ce8a7d7f726dc753f08b
+# __Secure-user-id=62533126
+# __Secure-access-token=10.62533126.gOtcHFoTSqqbkl6c3eqL7g.70.AQX5To4dmk1wbxCqOnDuOmK0rSsnftSTAJF1Ly-oQQ61MtaCsZdsji9BCvYOhq0fsnRtoj6jt7sC6RMX4U5hhTICdoaPESkpU65OrEM6YGCEWM1bK3KtTxWMq43KaxVepw.20210226153735.20260103144107.PA32PPuQOhZGLw0dft-02ydF8XKNos007DoW0b3i1Jc.14ed91521a2d62d40
+# xcid=38da76f5b31ab890fd6cbd15e1fc0081
+# is_cookies_accepted=1
+#
+# Как получить cookies:
+# 1. Откройте браузер и зайдите на ozon.ru
+# 2. Откройте DevTools (F12) -> Application/Storage -> Cookies -> https://www.ozon.ru
+# 3. Скопируйте все cookies в формате "name=value" (по одной на строку)
+# 4. Сохраните в файл cookie.txt в корне проекта
+
