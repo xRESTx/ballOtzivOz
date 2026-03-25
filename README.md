@@ -15,9 +15,9 @@ https://www.ozon.ru/highlight/bally-za-otzyv-1171518
 - **Баллы** за отзыв (целое число)
 - **Процент** = баллы * 100.0 / цена (округление до 2 знаков)
 
-Результаты сохраняются в файл `products.tsv` в формате TSV:
+Результаты сохраняются в файл `products.csv` в формате CSV:
 ```
-url<TAB>price<TAB>points<TAB>percent
+url,price,points,percent
 ```
 
 ## Требования
@@ -83,7 +83,7 @@ java -jar build/libs/ballotzivoz.jar \
   --rps 50 \
   --min-percent 5.0 \
   --timeout-ms 30000 \
-  --output results.tsv \
+  --output results.csv \
   --verbose
 ```
 
@@ -94,7 +94,7 @@ java -jar build/libs/ballotzivoz.jar \
 - `--rps N` - максимальное количество запросов в секунду (по умолчанию: 5)
 - `--min-percent N` - минимальный процент для фильтрации товаров (по умолчанию: 0.0)
 - `--timeout-ms N` - таймаут для HTTP запросов в миллисекундах (по умолчанию: 30000)
-- `--output PATH` - путь к выходному файлу (по умолчанию: products.tsv)
+- `--output PATH` - путь к выходному файлу (по умолчанию: products.csv)
 - `--cookie-file PATH` - путь к файлу с cookies (по умолчанию: cookie.txt)
 - `--verbose, -v` - включить подробное логирование (DEBUG уровень)
 - `--quiet, -q` - только ошибки (ERROR уровень)
@@ -106,10 +106,10 @@ java -jar build/libs/ballotzivoz.jar \
 
 Парсер использует JSON API Ozon для получения данных. Алгоритм пагинации:
 
-1. Загружается первая страница каталога (HTML)
-2. Из HTML извлекается JSON (из `window.__INITIAL_STATE__` или script тегов)
-3. Из JSON или HTML извлекается ссылка на следующую страницу (`nextPage`, `page` и т.д.)
-4. Загружается JSON следующей страницы напрямую
+1. Первый запрос идет сразу в JSON API: `https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/highlight/bally-za-otzyv-1171518&paginator_token=3618992`
+2. Из первого JSON извлекаются товары и поле `nextPage`
+3. Следующие страницы загружаются по URL из `nextPage`
+4. Если JSON временно не подходит, остаются fallback-варианты через embedded JSON и HTML
 5. Процесс повторяется до тех пор, пока не закончатся товары или не будет достигнут лимит страниц
 
 ### 2. Парсинг данных
@@ -132,8 +132,8 @@ java -jar build/libs/ballotzivoz.jar \
 
 ### 4. Сохранение результатов
 
-- **links.txt** - уникальные ссылки на товары (по одной на строку)
-- **output файл** (по умолчанию products.tsv) - полные данные в формате TSV: `url<TAB>price<TAB>points<TAB>percent`
+- **links.csv** - уникальные ссылки на товары
+- **output файл** (по умолчанию products.csv) - полные данные в формате CSV: `url,price,points,percent`
 
 ## Логирование
 
@@ -236,7 +236,7 @@ src/test/java/org/example/util/
 java -jar build/libs/ballotzivoz.jar \
   https://www.ozon.ru/highlight/bally-za-otzyv-1171518 \
   --min-percent 10.0 \
-  --output high-percent.tsv
+  --output high-percent.csv
 ```
 
 ### Ограничение количества страниц
@@ -262,7 +262,7 @@ java -jar build/libs/ballotzivoz.jar \
 - Парсер пропускает товары без цены или без баллов
 - URL товаров нормализуются (относительные преобразуются в абсолютные)
 - Процент вычисляется как `points * 100.0 / price` с округлением до 2 знаков
-- Результаты сохраняются в формате TSV (табуляция как разделитель)
+- Результаты сохраняются в формате CSV
 - Дубликаты товаров автоматически удаляются (по URL)
 
 ## Лицензия

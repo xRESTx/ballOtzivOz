@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 public class UrlUtil {
     private static final String OZON_BASE = "https://www.ozon.ru";
     private static final String OZON_API_PREFIX = OZON_BASE + "/api/entrypoint-api.bx/page/json/v2";
+    private static final String REVIEW_POINTS_HIGHLIGHT_PATH = "/highlight/bally-za-otzyv-1171518";
+    private static final String INITIAL_HIGHLIGHT_PAGINATOR_TOKEN = "3618992";
 
     public static String normalize(String url) {
         if (url == null || url.isBlank()) {
@@ -30,6 +32,43 @@ public class UrlUtil {
         }
         return url.contains("/api/entrypoint-api.bx/page/json/")
             || url.startsWith(OZON_API_PREFIX);
+    }
+
+    public static String normalizeProductUrl(String url) {
+        String normalizedUrl = normalize(url);
+        if (normalizedUrl == null) {
+            return null;
+        }
+
+        try {
+            URI uri = new URI(normalizedUrl);
+            String path = uri.getRawPath();
+            if (path != null && path.contains("/product/")) {
+                return new URI(
+                    uri.getScheme() != null ? uri.getScheme() : "https",
+                    null,
+                    uri.getHost() != null ? uri.getHost() : "www.ozon.ru",
+                    uri.getPort(),
+                    path,
+                    null,
+                    null
+                ).toString();
+            }
+        } catch (URISyntaxException ignored) {
+            // Fallback below keeps the product path and drops the query suffix if the URI is malformed.
+        }
+
+        int productQueryIndex = normalizedUrl.indexOf("/?");
+        if (normalizedUrl.contains("/product/") && productQueryIndex >= 0) {
+            return normalizedUrl.substring(0, productQueryIndex);
+        }
+        if (normalizedUrl.contains("/product/")) {
+            int queryIndex = normalizedUrl.indexOf('?');
+            if (queryIndex >= 0) {
+                return normalizedUrl.substring(0, queryIndex);
+            }
+        }
+        return normalizedUrl;
     }
 
     public static String addPageParam(String url, int page) {
@@ -73,8 +112,8 @@ public class UrlUtil {
             String path = uri.getRawPath();
             String query = uri.getRawQuery();
 
-            if ((query == null || query.isEmpty()) && path != null && path.startsWith("/highlight/")) {
-                query = "layout_container=default&layout_page_index=1&page=1&sorting=price";
+            if (isInitialReviewPointsHighlight(path, query)) {
+                return buildInitialHighlightApiUrl();
             }
 
             String pageUrl = path;
@@ -99,6 +138,23 @@ public class UrlUtil {
                 return null;
             }
         }
+    }
+
+    public static String buildInitialHighlightApiUrl() {
+        return OZON_API_PREFIX
+            + "?url=" + REVIEW_POINTS_HIGHLIGHT_PATH
+            + "&paginator_token=" + INITIAL_HIGHLIGHT_PAGINATOR_TOKEN;
+    }
+
+    private static boolean isInitialReviewPointsHighlight(String path, String query) {
+        if (path == null || (query != null && !query.isEmpty())) {
+            return false;
+        }
+
+        String canonicalPath = path.endsWith("/") && path.length() > 1
+            ? path.substring(0, path.length() - 1)
+            : path;
+        return REVIEW_POINTS_HIGHLIGHT_PATH.equals(canonicalPath);
     }
 
     public static String buildCategoryApiUrl(String categoryName, String paginatorToken) {

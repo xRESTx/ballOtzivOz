@@ -86,10 +86,21 @@ class UrlUtilTest {
     void testBuildJsonApiUrl_HighlightRootAddsDefaultQuery() {
         String result = UrlUtil.buildJsonApiUrl("https://www.ozon.ru/highlight/bally-za-otzyv-1171518");
 
-        assertTrue(result.contains("layout_container%3Ddefault"));
-        assertTrue(result.contains("layout_page_index%3D1"));
-        assertTrue(result.contains("page%3D1"));
-        assertTrue(result.contains("sorting%3Dprice"));
+        assertEquals(
+            "https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/highlight/bally-za-otzyv-1171518&paginator_token=3618992",
+            result
+        );
+    }
+
+    @Test
+    void testNormalizeProductUrl_StripsQueryTail() {
+        String productUrl =
+            "https://www.ozon.ru/product/svetilnik-potolochnyy-svetodiodnyy-nakladnoy-2688222903/?_bctx=CAYQvsBH&at=83tBMvpr";
+
+        assertEquals(
+            "https://www.ozon.ru/product/svetilnik-potolochnyy-svetodiodnyy-nakladnoy-2688222903/",
+            UrlUtil.normalizeProductUrl(productUrl)
+        );
     }
 }
 

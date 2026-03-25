@@ -740,7 +740,7 @@ public class OzonJsonParser {
             if (url == null || url.isEmpty()) {
                 return Optional.empty();
             }
-            url = UrlUtil.normalize(url);
+            url = UrlUtil.normalizeProductUrl(url);
 
             // Извлекаем цену
             int price = extractPrice(item);

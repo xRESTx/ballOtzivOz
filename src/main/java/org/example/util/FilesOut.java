@@ -44,7 +44,7 @@ public class FilesOut {
 
             // Записываем данные в кодировке Windows-1251
             var lines = products.stream()
-                .map(ProductRow::toTsvLine)
+                .map(ProductRow::toCsvLine)
                 .collect(Collectors.toList());
 
             Files.write(outputPath, lines, OUTPUT_CHARSET, StandardOpenOption.CREATE,
@@ -80,9 +80,9 @@ public class FilesOut {
                 Files.createDirectories(baseDirectory);
             }
 
-            Path linksPath = baseDirectory.resolve("links.txt");
+            Path linksPath = baseDirectory.resolve("links.csv");
             if (linksPath.equals(outputPath.toAbsolutePath().normalize())) {
-                linksPath = baseDirectory.resolve("links_only.txt");
+                linksPath = baseDirectory.resolve("links_only.csv");
                 log.warn("Файл ссылок совпал с output, сохраняем ссылки в {}", linksPath);
             }
             
@@ -96,7 +96,7 @@ public class FilesOut {
 
             var lines = urlToName.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry -> entry.getValue() + "\t" + entry.getKey())
+                .map(entry -> ProductRow.escapeCsv(entry.getValue()) + "," + ProductRow.escapeCsv(entry.getKey()))
                 .collect(Collectors.toList());
 
             Files.write(linksPath, lines, OUTPUT_CHARSET, StandardOpenOption.CREATE,

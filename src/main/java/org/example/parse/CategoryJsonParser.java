@@ -315,7 +315,7 @@ public class CategoryJsonParser {
             }
             
             // Нормализуем ссылку
-            link = UrlUtil.normalize(link);
+            link = UrlUtil.normalizeProductUrl(link);
 
             // 2. Название: item["mainState"][*]["textAtom"]["text"] (где type = "textAtom" и id = "name")
             String name = extractName(item);

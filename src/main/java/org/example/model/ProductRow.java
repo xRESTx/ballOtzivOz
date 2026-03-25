@@ -1,6 +1,7 @@
 package org.example.model;
 
 import java.util.Objects;
+import java.util.Locale;
 
 public class ProductRow {
     private final String name;
@@ -37,8 +38,31 @@ public class ProductRow {
         return percent;
     }
 
-    public String toTsvLine() {
-        return name + "\t" + url + "\t" + price + "\t" + points + "\t" + String.format("%.2f", percent);
+    public String toCsvLine() {
+        String percentValue = formatPercentForCsv();
+        return escapeCsv(name) + ","
+            + escapeCsv(url) + ","
+            + price + ","
+            + points + ","
+            + escapeCsv(percentValue);
+    }
+
+    private String formatPercentForCsv() {
+        return String.format(Locale.US, "%.2f", percent).replace('.', ',');
+    }
+
+    public static String escapeCsv(String value) {
+        String safeValue = value != null ? value : "";
+        boolean mustQuote = safeValue.contains(",")
+            || safeValue.contains("\"")
+            || safeValue.contains("\n")
+            || safeValue.contains("\r");
+
+        if (!mustQuote) {
+            return safeValue;
+        }
+
+        return "\"" + safeValue.replace("\"", "\"\"") + "\"";
     }
 
     @Override
@@ -59,7 +83,7 @@ public class ProductRow {
     @Override
     public String toString() {
         return "ProductRow{name='" + name + "', url='" + url + "', price=" + price 
-            + ", points=" + points + ", percent=" + String.format("%.2f", percent) + "}";
+            + ", points=" + points + ", percent=" + formatPercentForCsv() + "}";
     }
 }
 

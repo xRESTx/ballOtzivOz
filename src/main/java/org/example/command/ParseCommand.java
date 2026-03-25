@@ -63,8 +63,8 @@ public class ParseCommand implements Runnable {
 
     @CommandLine.Option(
         names = {"--output"},
-        description = "Путь к выходному TSV файлу (по умолчанию: products.tsv)",
-        defaultValue = "products.tsv"
+        description = "Путь к выходному CSV файлу (по умолчанию: products.csv)",
+        defaultValue = "products.csv"
     )
     private String outputPath;
 
@@ -109,7 +109,10 @@ public class ParseCommand implements Runnable {
         Set<String> visitedPageUrls = new LinkedHashSet<>();
         long totalRequests = 0;
         int processedPages = 0;
-        String currentUrl = sourceUrl;
+        String currentUrl = UrlUtil.buildJsonApiUrl(sourceUrl);
+        if (currentUrl == null) {
+            currentUrl = sourceUrl;
+        }
 
         while (currentUrl != null && (maxPages == 0 || processedPages < maxPages)) {
             if (!visitedPageUrls.add(currentUrl)) {

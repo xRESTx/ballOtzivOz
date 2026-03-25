@@ -221,7 +221,7 @@ public class OzonHtmlParser {
             if (href == null || href.isEmpty()) {
                 return Optional.empty();
             }
-            String url = UrlUtil.normalize(href);
+            String url = UrlUtil.normalizeProductUrl(href);
 
             // Ищем цену в родительских элементах
             Element container = tile.parent();
