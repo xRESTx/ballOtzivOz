@@ -6,7 +6,7 @@ Production-ready Java приложение для парсинга публич�
 
 Парсер обрабатывает каталог Ozon по URL формата:
 ```
-https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t
+https://www.ozon.ru/highlight/bally-za-otzyv-1171518
 ```
 
 Для каждой карточки товара извлекает:
@@ -15,7 +15,7 @@ https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t
 - **Баллы** за отзыв (целое число)
 - **Процент** = баллы * 100.0 / цена (округление до 2 знаков)
 
-Результаты сохраняются в файл `links.txt` в формате TSV:
+Результаты сохраняются в файл `products.tsv` в формате TSV:
 ```
 url<TAB>price<TAB>points<TAB>percent
 ```
@@ -71,14 +71,14 @@ name=value; domain=.ozon.ru; path=/; secure
 
 ```bash
 java -jar build/libs/ballotzivoz.jar \
-  https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t
+  https://www.ozon.ru/highlight/bally-za-otzyv-1171518
 ```
 
 ### С параметрами
 
 ```bash
 java -jar build/libs/ballotzivoz.jar \
-  https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t \
+  https://www.ozon.ru/highlight/bally-za-otzyv-1171518 \
   --max-pages 10 \
   --rps 50 \
   --min-percent 5.0 \
@@ -89,12 +89,12 @@ java -jar build/libs/ballotzivoz.jar \
 
 ### Параметры командной строки
 
-- `URL` (обязательный) - URL каталога Ozon для парсинга
+- `URL` (необязательный) - URL страницы Ozon для парсинга (по умолчанию: `https://www.ozon.ru/highlight/bally-za-otzyv-1171518`)
 - `--max-pages N` - максимальное количество страниц (0 = без ограничений, по умолчанию: 0)
-- `--rps N` - максимальное количество запросов в секунду (по умолчанию: 100)
+- `--rps N` - максимальное количество запросов в секунду (по умолчанию: 5)
 - `--min-percent N` - минимальный процент для фильтрации товаров (по умолчанию: 0.0)
 - `--timeout-ms N` - таймаут для HTTP запросов в миллисекундах (по умолчанию: 30000)
-- `--output PATH` - путь к выходному файлу (по умолчанию: links.txt)
+- `--output PATH` - путь к выходному файлу (по умолчанию: products.tsv)
 - `--cookie-file PATH` - путь к файлу с cookies (по умолчанию: cookie.txt)
 - `--verbose, -v` - включить подробное логирование (DEBUG уровень)
 - `--quiet, -q` - только ошибки (ERROR уровень)
@@ -108,7 +108,7 @@ java -jar build/libs/ballotzivoz.jar \
 
 1. Загружается первая страница каталога (HTML)
 2. Из HTML извлекается JSON (из `window.__INITIAL_STATE__` или script тегов)
-3. Из JSON извлекается ссылка на следующую страницу (`nextPage`, `paginator_token` и т.д.)
+3. Из JSON или HTML извлекается ссылка на следующую страницу (`nextPage`, `page` и т.д.)
 4. Загружается JSON следующей страницы напрямую
 5. Процесс повторяется до тех пор, пока не закончатся товары или не будет достигнут лимит страниц
 
@@ -133,7 +133,7 @@ java -jar build/libs/ballotzivoz.jar \
 ### 4. Сохранение результатов
 
 - **links.txt** - уникальные ссылки на товары (по одной на строку)
-- **output файл** (по умолчанию links.txt) - полные данные в формате TSV: `url<TAB>price<TAB>points<TAB>percent`
+- **output файл** (по умолчанию products.tsv) - полные данные в формате TSV: `url<TAB>price<TAB>points<TAB>percent`
 
 ## Логирование
 
@@ -150,7 +150,7 @@ java -jar build/libs/ballotzivoz.jar \
 === Запуск парсера Ozon ===
 URL: https://www.ozon.ru/category/...
 Max pages: без ограничений
-RPS: 100
+RPS: 5
 Min percent: 0.0
 ...
 ```
@@ -234,7 +234,7 @@ src/test/java/org/example/util/
 
 ```bash
 java -jar build/libs/ballotzivoz.jar \
-  https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t \
+  https://www.ozon.ru/highlight/bally-za-otzyv-1171518 \
   --min-percent 10.0 \
   --output high-percent.tsv
 ```
@@ -243,7 +243,7 @@ java -jar build/libs/ballotzivoz.jar \
 
 ```bash
 java -jar build/libs/ballotzivoz.jar \
-  https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t \
+  https://www.ozon.ru/highlight/bally-za-otzyv-1171518 \
   --max-pages 5 \
   --verbose
 ```
@@ -252,7 +252,7 @@ java -jar build/libs/ballotzivoz.jar \
 
 ```bash
 java -jar build/libs/ballotzivoz.jar \
-  https://www.ozon.ru/category/elektronika-15500/?has_points_from_reviews=t \
+  https://www.ozon.ru/highlight/bally-za-otzyv-1171518 \
   --rps 10 \
   --timeout-ms 60000
 ```

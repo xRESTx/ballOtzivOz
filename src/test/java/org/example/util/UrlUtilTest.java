@@ -62,5 +62,34 @@ class UrlUtilTest {
         assertTrue(result.contains("page=5"));
         assertFalse(result.contains("page=1"));
     }
+
+    @Test
+    void testBuildJsonApiUrl_HighlightUrl() {
+        String url = "https://www.ozon.ru/highlight/bally-za-otzyv-1171518/?page=2";
+        String result = UrlUtil.buildJsonApiUrl(url);
+
+        assertTrue(result.startsWith("https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url="));
+        assertTrue(result.contains("%2Fhighlight%2Fbally-za-otzyv-1171518%2F%3Fpage%3D2"));
+        assertFalse(result.contains("layout_page_index"));
+    }
+
+    @Test
+    void testBuildJsonApiUrl_ReturnsApiUrlAsIs() {
+        String apiUrl =
+            "https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=%2Fhighlight%2Fbally-za-otzyv-1171518%2F%3Fpage%3D2";
+
+        assertEquals(apiUrl, UrlUtil.buildJsonApiUrl(apiUrl));
+        assertTrue(UrlUtil.isApiUrl(apiUrl));
+    }
+
+    @Test
+    void testBuildJsonApiUrl_HighlightRootAddsDefaultQuery() {
+        String result = UrlUtil.buildJsonApiUrl("https://www.ozon.ru/highlight/bally-za-otzyv-1171518");
+
+        assertTrue(result.contains("layout_container%3Ddefault"));
+        assertTrue(result.contains("layout_page_index%3D1"));
+        assertTrue(result.contains("page%3D1"));
+        assertTrue(result.contains("sorting%3Dprice"));
+    }
 }
 

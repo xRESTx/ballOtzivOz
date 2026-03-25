@@ -167,16 +167,19 @@ public class SimpleHttpClient {
             String pageViewId = UUID.randomUUID().toString();
             String parentRequestId = UUID.randomUUID().toString().replace("-", "");
             
+            boolean isHighlightRequest = url.contains("/highlight/")
+                || url.contains("%2Fhighlight%2F");
+
             requestBuilder
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36")
                 .header("Accept", "application/json")
-                .header("Accept-Language", "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3")
+                .header("Accept-Language", "ru-RU,ru;q=0.5")
                 // Не указываем Accept-Encoding для API запросов, чтобы получить несжатые ответы
                 // (OkHttp не поддерживает автоматическую распаковку br и zstd)
-                .header("Referer", "https://www.ozon.ru/")
+                .header("Referer", "https://www.ozon.ru/sw/bx/3.0.9.js")
                 .header("x-o3-app-name", "dweb_client")
-                .header("x-o3-app-version", "release_24-11-2025_810214bf")
-                .header("x-o3-manifest-version", "frontend-ozon-ru:810214bf758f49057080e0d8aa6c82511b4ec186,checkout-render-api:1e0f52903de2eda47a258b6f142f07269cdae765,fav-render-api:3774a6d81bb05ac6e51f04817f0995097e7b1832,sf-render-api:e5c894ee84ac2cd9fc977be7a4bcae05c744ecbd")
+                .header("x-o3-app-version", "release_20-2-2026_9c20bce4")
+                .header("x-o3-manifest-version", "frontend-ozon-ru:9c20bce41aec03a5c58f42dabd0e82c7ac21d384,fav-render-api:ec1ea23fd8d3714492faba924045a3e5b2a128ea,checkout-render-api:d8a2d03f4ee4f5fd22735e6235d0ca9bd755e4a3,search-render-api:d7d966781ee5deff3839cbabdfbf46962c71d4a3,sf-render-api:1ab2b8525771890b561ff0cab4900382cfb7c4c4")
                 .header("x-page-view-id", pageViewId)
                 .header("x-o3-parent-requestid", parentRequestId)
                 .header("Content-Type", "application/json")
@@ -184,14 +187,19 @@ public class SimpleHttpClient {
                 .header("Sec-Fetch-Dest", "empty")
                 .header("Sec-Fetch-Mode", "cors")
                 .header("Sec-Fetch-Site", "same-origin")
+                .header("Priority", "u=1, i")
                 .header("Connection", "keep-alive");
+            if (isHighlightRequest) {
+                requestBuilder
+                    .header("x-o3-page-type", "highlight")
+                    .header("x-page-previous", "home");
+            }
         } else {
             // Заголовки для обычных HTML запросов
             requestBuilder
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36")
                 .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-                .header("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
-                .header("Accept-Encoding", "gzip, deflate")
+                .header("Accept-Language", "ru-RU,ru;q=0.5")
                 .header("Connection", "keep-alive")
                 .header("Upgrade-Insecure-Requests", "1")
                 .header("Sec-Fetch-Dest", "document")

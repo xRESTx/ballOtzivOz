@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class FilesOut {
     private static final Logger log = LoggerFactory.getLogger(FilesOut.class);
-    private static final Charset WINDOWS_1251 = Charset.forName("windows-1251");
+    private static final Charset OUTPUT_CHARSET = Charset.forName("UTF-8");
     
     private final Path outputPath;
 
@@ -47,7 +47,7 @@ public class FilesOut {
                 .map(ProductRow::toTsvLine)
                 .collect(Collectors.toList());
 
-            Files.write(outputPath, lines, WINDOWS_1251, StandardOpenOption.CREATE, 
+            Files.write(outputPath, lines, OUTPUT_CHARSET, StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 
             log.debug("Записано {} товаров в {}", products.size(), outputPath);
@@ -72,7 +72,19 @@ public class FilesOut {
         }
 
         try {
-            Path linksPath = outputPath.getParent().resolve("links.txt");
+            Path baseDirectory = outputPath.toAbsolutePath().getParent();
+            if (baseDirectory == null) {
+                baseDirectory = Path.of(".").toAbsolutePath().normalize();
+            }
+            if (!Files.exists(baseDirectory)) {
+                Files.createDirectories(baseDirectory);
+            }
+
+            Path linksPath = baseDirectory.resolve("links.txt");
+            if (linksPath.equals(outputPath.toAbsolutePath().normalize())) {
+                linksPath = baseDirectory.resolve("links_only.txt");
+                log.warn("Файл ссылок совпал с output, сохраняем ссылки в {}", linksPath);
+            }
             
             // Создаем Map для хранения названий по URL (если есть дубликаты, берем первое)
             Map<String, String> urlToName = products.stream()
@@ -87,7 +99,7 @@ public class FilesOut {
                 .map(entry -> entry.getValue() + "\t" + entry.getKey())
                 .collect(Collectors.toList());
 
-            Files.write(linksPath, lines, WINDOWS_1251, StandardOpenOption.CREATE, 
+            Files.write(linksPath, lines, OUTPUT_CHARSET, StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 
             log.debug("Записано {} уникальных ссылок в {}", urlToName.size(), linksPath);
